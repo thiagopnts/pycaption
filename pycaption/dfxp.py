@@ -71,7 +71,12 @@ class DFXPReader(BaseReader):
     def _translate_div(self, div):
         captions = []
         for p_tag in div.find_all(u'p'):
-            captions.append(self._translate_p_tag(p_tag))
+            translated = None
+            try:
+                translated = self._translate_p_tag(p_tag)
+            except:
+                continue
+            captions.append(translated)
         return captions
 
     def _translate_p_tag(self, p_tag):

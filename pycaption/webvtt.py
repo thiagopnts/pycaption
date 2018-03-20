@@ -197,8 +197,23 @@ class WebVTTWriter(BaseWriter):
             if node.type == CaptionNode.TEXT:
                 s += node.content or u'&nbsp;'
             elif node.type == CaptionNode.STYLE:
-                # TODO: Ignoring style so far.
-                pass
+                if u'italics' in node.content and node.content[u'italics'] == True:
+                    if node.start == True:
+                        s += u'<i>'
+                    else:
+                        s += u'</i>'
+                elif u'bold' in node.content and node.content[u'bold'] == True:
+                    if node.start == True:
+                        s += u'<b>'
+                    else:
+                        s += u'</b>'
+                elif u'underline' in node.content and node.content[u'underline'] == True:
+                    if node.start == True:
+                        s += u'<u>'
+                    else:
+                        s += u'</u>'
+                else:
+                    pass
             elif node.type == CaptionNode.BREAK:
                 if i > 0 and nodes[i-1].type == CaptionNode.BREAK:
                     s += u'&nbsp;'

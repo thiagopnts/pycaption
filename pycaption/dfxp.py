@@ -172,6 +172,10 @@ class DFXPReader(BaseReader):
                 attrs[u'font-size'] = dfxp_attrs[arg]
             elif arg == u"tts:color":
                 attrs[u'color'] = dfxp_attrs[arg]
+            elif arg == u"tts:fontweight" and dfxp_attrs[arg] == u"bold":
+                attrs[u'bold'] = True
+            elif arg == u"tts:textdecoration" and dfxp_attrs[arg] == u"underline":
+                attrs[u'underline'] = True
         return attrs
 
     # Merge together captions that have the same start/end times.

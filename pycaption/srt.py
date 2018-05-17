@@ -44,6 +44,8 @@ class SRTReader(BaseReader):
                 caption.end = self._srttomicro(timing.group(2).strip(u' \r\n'))
 
             for line in lines[start_line + 2:end_line - 1]:
+                line = re.sub(re.compile(u"<font color=\"#[0-9a-f]{6}\">", re.I | re.U), "", line, re.I | re.U)
+                line = re.sub(re.compile(u"</font>", re.I | re.U), "", line, re.I | re.U)
                 # skip extra blank lines
                 if not caption.nodes or line != u'':
                     caption.nodes.append(CaptionNode.create_text(line))

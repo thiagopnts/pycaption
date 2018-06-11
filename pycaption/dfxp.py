@@ -35,6 +35,9 @@ DFXP_DEFAULT_REGION_ID = u'bottom'
 
 class DFXPReader(BaseReader):
     def __init__(self, *args, **kw):
+        self.framerate = 30
+        self.multiplier = [1, 1]
+        self.timebase = "media"
         self.nodes = []
 
     def detect(self, content):
@@ -49,6 +52,16 @@ class DFXPReader(BaseReader):
 
         dfxp_soup = BeautifulSoup(content)
         captions = CaptionSet()
+
+        tt = dfxp_soup.find_all(u'tt')
+        if len(tt) >= 1:
+            self.timebase = tt[0].attrs.get(u'ttp:timebase')
+            self.framerate = int(tt[0].attrs.get(u'ttp:framerate', u'30'))
+            multiplier = tt[0].attrs.get(u'ttp:frameratemultiplier', u'1 1').split(u' ')
+            if len(multiplier) != 2:
+                multiplier = [1, 1]
+            self.multiplier[0] = int(multiplier[0])
+            self.multiplier[1] = int(multiplier[1])
 
         # Each div represents all the captions for a single language.
         for div in dfxp_soup.find_all(u'div'):
@@ -109,12 +122,18 @@ class DFXPReader(BaseReader):
             timesplit[2] = timesplit[2] + u'.000'
         secsplit = timesplit[2].split(u'.')
         if len(timesplit) > 3:
-            secsplit.append((int(timesplit[3]) / 30) * 100)
+            if self.timebase == "smpte":
+                secsplit[1] = int(float(timesplit[3]) / float(self.framerate) * 1000.0)
+            else:
+                secsplit[1] = int(float(int(timesplit[3]) * self.multiplier[1]) / float(self.framerate * self.multiplier[0]) * 1000.0)
         microseconds = (int(timesplit[0]) * 3600000000 +
                         int(timesplit[1]) * 60000000 +
                         int(secsplit[0]) * 1000000 +
                         int(secsplit[1]) * 1000)
-        return microseconds
+        if self.timebase == "smpte":
+            return int((float(microseconds) * self.multiplier[1]) / float(self.multiplier[0]))
+        else:
+            return microseconds
 
     def _translate_tag(self, tag):
         # convert text

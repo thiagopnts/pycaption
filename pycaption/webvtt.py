@@ -143,10 +143,10 @@ class WebVTTWriter(BaseWriter):
             self.metadata.update(kw["metadata"])
 
     def write(self, caption_set):
-        output = self.HEADER
+        output = [self.HEADER]
         for key in self.metadata:
-            output += key + ':' + str(self.metadata[key]) + '\n'
-        output += u'\n'
+            output.append(key + ':' + str(self.metadata[key]) + '\n')
+        output.append(u'\n')
 
         if caption_set.is_empty():
             return output
@@ -159,10 +159,10 @@ class WebVTTWriter(BaseWriter):
         # support a single one for now.
         lang = caption_set.get_languages()[0]
         for caption in caption_set.get_captions(lang):
-            output += self._write_caption(caption)
-            output += u'\n'
+            output.append(self._write_caption(caption))
+            output.append(u'\n')
 
-        return output
+        return ''.join(output)
 
     def _timestamp(self, ts):
         ts = float(ts)/1000000
@@ -178,12 +178,12 @@ class WebVTTWriter(BaseWriter):
         start = self._timestamp(sub.start)
         end = self._timestamp(sub.end)
 
-        output = u"%s --> %s\n" % (start, end)
+        output = [u"%s --> %s\n" % (start, end)]
 
-        output += self._convert_nodes(sub.nodes)
-        output += u'\n'
+        output.append(self._convert_nodes(sub.nodes))
+        output.append(u'\n')
 
-        return output
+        return ''.join(output)
 
     def _convert_nodes(self, nodes):
         """Convert a Caption's nodes to text.
@@ -191,34 +191,34 @@ class WebVTTWriter(BaseWriter):
         if not nodes:
             return u'&nbsp;'
 
-        s = u''
+        s = []
 
         for i, node in enumerate(nodes):
             if node.type == CaptionNode.TEXT:
-                s += node.content or u'&nbsp;'
+                s.append(node.content or u'&nbsp;')
             elif node.type == CaptionNode.STYLE:
                 if u'italics' in node.content and node.content[u'italics'] == True:
                     if node.start == True:
-                        s += u'<i>'
+                        s.append(u'<i>')
                     else:
-                        s += u'</i>'
+                        s.append(u'</i>')
                 elif u'bold' in node.content and node.content[u'bold'] == True:
                     if node.start == True:
-                        s += u'<b>'
+                        s.append(u'<b>')
                     else:
-                        s += u'</b>'
+                        s.append(u'</b>')
                 elif u'underline' in node.content and node.content[u'underline'] == True:
                     if node.start == True:
-                        s += u'<u>'
+                        s.append(u'<u>')
                     else:
-                        s += u'</u>'
+                        s.append(u'</u>')
                 else:
                     pass
             elif node.type == CaptionNode.BREAK:
                 if i > 0 and nodes[i-1].type == CaptionNode.BREAK:
-                    s += u'&nbsp;'
+                    s.append(u'&nbsp;')
                 if i == 0:
-                    s += u'&nbsp;'
-                s += u'\n'
+                    s.append(u'&nbsp;')
+                s.append(u'\n')
 
-        return s
+        return ''.join(s)

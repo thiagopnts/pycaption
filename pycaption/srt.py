@@ -109,17 +109,17 @@ class SRTWriter(BaseWriter):
         return caption_content
 
     def _recreate_lang(self, captions):
-        srt = u''
+        srt = []
         count = 1
 
         for caption in captions:
-            srt += u'%s\n' % count
+            srt.append(u'%s\n' % count)
 
             start = caption.format_start(msec_separator=u',')
             end = caption.format_end(msec_separator=u',')
             timestamp = u'%s --> %s\n' % (start[:12], end[:12])
 
-            srt += timestamp.replace(u'.', u',')
+            srt.append(timestamp.replace(u'.', u','))
 
             new_content = u''
             for node in caption.nodes:
@@ -130,10 +130,10 @@ class SRTWriter(BaseWriter):
             while u'\n\n' in new_content:
                 new_content = new_content.replace(u'\n\n', u'\n')
 
-            srt += u"%s%s" % (new_content, u'\n\n')
+            srt.append(u"%s%s" % (new_content, u'\n\n'))
             count += 1
 
-        return srt[:-1]  # remove unwanted newline at end of file
+        return ''.join(srt)[:-1]  # remove unwanted newline at end of file
 
     def _recreate_line(self, srt, line):
         if line.type == CaptionNode.TEXT:

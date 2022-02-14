@@ -21,14 +21,14 @@ class CaptionConverter(object):
     def read(self, content, caption_reader):
         try:
             self.captions = caption_reader.read(content)
-        except AttributeError, e:
+        except AttributeError as e:
             raise Exception(e)
         return self
 
     def write(self, caption_writer):
         try:
             return caption_writer.write(self.captions)
-        except AttributeError, e:
+        except AttributeError as e:
             raise Exception(e)
 
 

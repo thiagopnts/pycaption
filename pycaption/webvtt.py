@@ -62,7 +62,7 @@ class WebVTTReader(BaseReader):
                     caption = self._parse_timing_line(line, last_start_time)
                 except CaptionReadError as e:
                     new_message = u'%s (line %d)' % (e.args[0], timing_line)
-                    raise type(e)(new_message).with_traceback(sys.exc_info()[2]) from None
+                    raise type(e), new_message, sys.exc_info()[2]
 
             elif u'' == line:
                 if found_timing:
